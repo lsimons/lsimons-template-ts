@@ -1,0 +1,33 @@
+{
+    "name": "lsimons-$project",
+    "version": "0.1.0",
+    "description": "$shortDescription",
+    "type": "module",
+    "private": true,
+    "engines": {
+        "node": ">=22.18"
+    },
+    "packageManager": "pnpm@10.33.0",
+    "bin": {
+        "$project": "./src/cli.ts"
+    },
+    "scripts": {
+        "start": "node src/cli.ts",
+        "dev": "node --watch src/cli.ts",
+        "build": "tsc -p tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write .",
+        "format:check": "biome format .",
+        "test": "vitest run --coverage",
+        "test:watch": "vitest"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.4.12",
+        "@types/node": "^25.6.0",
+        "@vitest/coverage-v8": "^4.1.4",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.4"
+    }
+}
