@@ -24,8 +24,8 @@ you need a monorepo.
 
 ## Included Configuration
 
-- **Node.js 22.18+** required — uses native TypeScript type stripping,
-  so no `tsx`/`ts-node` needed for development
+- **Node.js 24 LTS** (current Active LTS as of 2026) — uses native
+  TypeScript type stripping, so no `tsx`/`ts-node` needed for development
 - **pnpm** for package management (version pinned via `packageManager`)
 - **TypeScript 5.8+** with strict mode plus `noUncheckedIndexedAccess`,
   `exactOptionalPropertyTypes`, `noImplicitOverride`,
