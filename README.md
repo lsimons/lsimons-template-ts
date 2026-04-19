@@ -6,21 +6,24 @@ you need a monorepo.
 
 ## Using This Template
 
-1. Copy this repository to create a new project
-2. Replace placeholders throughout:
-   - `$project` - project name (e.g., `myproject`)
-   - `$shortDescription` - one-line description
+1. Click **Use this template** on GitHub (or clone this repo).
+2. Clone your new repo locally and run:
 
-3. Update `package.json`:
-   - Change `name` and `description`
-   - Update the `bin` entry if creating a CLI (or remove it)
+   ```bash
+   mise install          # pin + install node + pnpm
+   mise run init         # rename `template` → your project name
+   mise run install      # pnpm install
+   ```
 
-4. Replace `src/cli.ts` / `src/greet.ts` with your entrypoint and modules.
-   Keep `.ts` extensions in import specifiers — required by Node's native
-   TypeScript support and `NodeNext` module resolution.
+   `mise run init` auto-detects your project name from the git remote
+   (or directory name), stripping `lsimons-` / `-ts` suffixes. Pass
+   `--name foo` to override. See `scripts/init.py` for details.
 
-5. Update `AGENTS.md` (and `CLAUDE.md` symlink) with project-specific
+3. Update `AGENTS.md` (and `CLAUDE.md` symlink) with project-specific
    instructions.
+4. Replace `src/cli.ts` / `src/greet.ts` with your entrypoint and
+   modules. Keep `.ts` extensions in import specifiers — required by
+   Node's native TypeScript support and `NodeNext` module resolution.
 
 ## Included Configuration
 
@@ -37,18 +40,16 @@ you need a monorepo.
 - **GitHub Actions CI** on push/PR to main, with actions pinned to
   full-length commit SHAs (the repo setting *Require actions to be
   pinned to a full-length commit SHA* is enabled)
-
-> **Note:** CI is red on this template repo itself — the `$project`
-> placeholder in `package.json` makes the package name malformed on
-> purpose. Once you fork and do the search/replace described above, CI
-> turns green.
+- **`.mise.toml`** pins toolchain + defines every repo task
 
 ## Project Structure
 
 ```
-lsimons-$project/
-├── .github/workflows/ci.yml  # CI pipeline
+lsimons-template-ts/
+├── .github/workflows/ci.yml  # CI pipeline (mise-action)
+├── .mise.toml                # Toolchain pin + task runner
 ├── docs/spec/                # Feature specifications
+├── scripts/init.py           # Rename-to-your-project helper
 ├── src/                      # Source code
 │   ├── cli.ts                # CLI entrypoint (example)
 │   └── greet.ts              # Example module
@@ -67,26 +68,19 @@ lsimons-$project/
 ## Development Commands
 
 ```bash
-# Setup
-pnpm install
+mise install          # one-time: pin + install toolchain
+mise run install      # pnpm install
 
 # Run (no build step — native TS on Node 22.18+)
 pnpm start
-pnpm dev        # watch mode
+pnpm dev              # watch mode
 
-# Run tests
-pnpm test
-pnpm test:watch
-
-# Typecheck
-pnpm typecheck
-
-# Lint + format
-pnpm lint
-pnpm format
-
-# Build (emit to dist/ when publishing or shipping compiled JS)
-pnpm build
+mise run test         # vitest run --coverage
+mise run typecheck    # tsc --noEmit
+mise run lint         # biome check .
+mise run format       # biome format --write .
+mise run build        # tsc -p tsconfig.build.json (emit dist/)
+mise run ci           # full CI gate
 ```
 
 ## Adapting to Other Project Types

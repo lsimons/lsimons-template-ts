@@ -1,7 +1,7 @@
 {
-    "name": "lsimons-$project",
+    "name": "lsimons-template",
     "version": "0.1.0",
-    "description": "$shortDescription",
+    "description": "Brief project description",
     "type": "module",
     "private": true,
     "engines": {
@@ -9,7 +9,7 @@
     },
     "packageManager": "pnpm@10.33.0",
     "bin": {
-        "$project": "./src/cli.ts"
+        "template": "./src/cli.ts"
     },
     "scripts": {
         "start": "node src/cli.ts",

@@ -11,6 +11,10 @@ pnpm = "10"
 [env]
 _.file = { path = ".env", optional = true }
 
+[tasks.init]
+description = "Rename this template to a new project (see scripts/init.py)"
+run = "python3 scripts/init.py"
+
 [tasks.install]
 description = "pnpm install --frozen-lockfile"
 run = "pnpm install --frozen-lockfile"
