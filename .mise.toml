@@ -1,0 +1,40 @@
+# mise: https://mise.jdx.dev/
+#
+# `mise install` installs everything under [tools]; `mise run <task>`
+# delegates to pnpm scripts in package.json. `.nvmrc` stays authoritative —
+# mise reads it.
+
+[tools]
+node = "24"
+pnpm = "10"
+
+[env]
+_.file = { path = ".env", optional = true }
+
+[tasks.install]
+description = "pnpm install --frozen-lockfile"
+run = "pnpm install --frozen-lockfile"
+
+[tasks.lint]
+description = "Biome lint + format check"
+run = "pnpm lint"
+
+[tasks.format]
+description = "Biome format --write"
+run = "pnpm format"
+
+[tasks.typecheck]
+description = "tsc --noEmit"
+run = "pnpm typecheck"
+
+[tasks.test]
+description = "vitest run --coverage"
+run = "pnpm test"
+
+[tasks.build]
+description = "tsc -p tsconfig.build.json"
+run = "pnpm build"
+
+[tasks.ci]
+description = "Full CI gate"
+depends = ["lint", "typecheck", "test", "build"]

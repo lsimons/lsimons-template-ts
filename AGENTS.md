@@ -6,13 +6,15 @@ Brief project description.
 
 ## Quick Reference
 
-- **Setup**: `pnpm install`
+- **One-time**: `mise install`
+- **Setup**: `mise run install` (or `pnpm install`)
 - **Run**: `pnpm start` (or `node src/cli.ts`)
 - **Dev (watch)**: `pnpm dev`
-- **Test**: `pnpm test`
-- **Typecheck**: `pnpm typecheck`
-- **Lint**: `pnpm lint`
-- **Format**: `pnpm format`
+- **Test**: `mise run test` (or `pnpm test`)
+- **Typecheck**: `mise run typecheck` (or `pnpm typecheck`)
+- **Lint**: `mise run lint` (or `pnpm lint`)
+- **Format**: `mise run format` (or `pnpm format`)
+- **Full CI gate**: `mise run ci`
 
 ## Structure
 
@@ -42,9 +44,7 @@ Work is NOT complete until `git push` succeeds.
 
 1. **Quality gates** (if code changed):
    ```bash
-   pnpm lint
-   pnpm typecheck
-   pnpm test
+   mise run ci
    ```
 
 2. **Push**:
