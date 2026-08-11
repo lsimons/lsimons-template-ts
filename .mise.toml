@@ -74,10 +74,21 @@ depends = ["lint", "typecheck", "test", "build"]
 # Supply-chain audit. Two halves, both needing the network, which is why
 # neither is part of `ci`:
 #
-#   1. zizmor over the workflows and the dependabot config — the local
-#      mirror of the `zizmor` CI job, using the mise-pinned binary.
+#   1. zizmor over the workflows and the dependabot config, using the
+#      mise-pinned binary.
 #   2. `pnpm audit` over the resolved dependency tree, which zizmor does
 #      not look at at all.
+#
+# This is a deliberate SUPERSET of the `zizmor` CI job, not a mirror of
+# it. `--strict-collection` (fail rather than warn on schema errors in a
+# collected file) has no corresponding zizmor-action input, so it can
+# only be had locally. `--collect` is left off for the same reason it is
+# left off in CI: zizmor's default already collects every input kind
+# including dependabot config, and `all` differs only by ignoring
+# .gitignore.
+#
+# `pnpm audit` has no CI counterpart at all, so it runs only when someone
+# types this — see the note in AGENTS.md.
 #
 # Without a token zizmor silently falls back to offline and skips the
 # `impostor-commit` and `known-vulnerable-actions` audits, which is an
@@ -94,7 +105,7 @@ if [ -z "$GH_TOKEN" ]; then
   exit 1
 fi
 export GH_TOKEN
-zizmor --collect=all --strict-collection .
+zizmor --strict-collection .
 pnpm audit
 """
 

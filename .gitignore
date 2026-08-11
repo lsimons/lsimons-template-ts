@@ -50,4 +50,4 @@ Thumbs.db
 # `.claude/` itself is tracked on purpose — settings.json is shared
 # config. Only per-user state and scratch worktrees are ignored.
 .claude/settings.local.json
-.claude/worktrees
+.claude/worktrees/
