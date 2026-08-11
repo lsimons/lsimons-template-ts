@@ -19,6 +19,9 @@ jobs:
   lint-and-test:
     name: Lint and test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -42,8 +45,11 @@ jobs:
       - name: Install dependencies
         run: mise run install
 
-      # Together these are exactly `mise run ci`, kept as separate steps
-      # so a failure is attributable from the run summary.
+      # The same four checks as `mise run ci`, but run sequentially and as
+      # separate steps. `mise run ci` uses `depends`, which runs them
+      # concurrently and aborts siblings on the first failure, so it can
+      # attribute a failure to the wrong task; this ordering reports the
+      # true first failure.
       - name: Lint (Biome + actionlint)
         run: mise run lint
 
@@ -59,6 +65,7 @@ jobs:
   zizmor:
     name: Zizmor (GitHub Actions audit)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -70,11 +77,14 @@ jobs:
         uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
         with:
           advanced-security: false
-          # The action's own defaults are version "latest" and
-          # collect "default". Pin the version so a zizmor release cannot
-          # turn CI red on its own, and set collect: all so
-          # .github/dependabot.yml is audited too. Both must match
-          # `mise run audit` for that task to be a real local mirror —
-          # bump them together.
+          # The action defaults this to "latest". Pin it so a zizmor
+          # release cannot turn CI red on its own, and keep it in step
+          # with the `zizmor` entry in .mise.toml — bump them together.
           version: "1.29.0"
-          collect: all
+          # `collect` is deliberately left at the action's default.
+          # zizmor's `default` and `all` collect the same kinds of input
+          # — workflows, action definitions, dependabot and pre-commit
+          # config — and differ only in whether .gitignore is honoured.
+          # `default` already audits .github/dependabot.yml here, and
+          # `all` would additionally walk gitignored trees such as
+          # node_modules/, which is the wrong direction.

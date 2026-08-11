@@ -10,6 +10,7 @@
       "Bash(mise run build)",
       "Bash(mise run ci)",
       "Bash(mise run ci-watch)",
+      "Bash(mise run audit)",
       "Bash(mise run init *)",
       "Bash(mise run install *)",
       "Bash(mise run lint *)",
@@ -18,7 +19,8 @@
       "Bash(mise run test *)",
       "Bash(mise run build *)",
       "Bash(mise run ci *)",
-      "Bash(mise run ci-watch *)"
+      "Bash(mise run ci-watch *)",
+      "Bash(mise run audit *)"
     ]
   }
 }

@@ -90,6 +90,11 @@ docs/spec/                Feature specifications
   deliberately with `mise up` and read the diff.
 - `mise run audit` refuses to run without a GitHub token rather than
   quietly falling back to zizmor's weaker offline checks.
+- **`mise run audit` is not enforced by CI.** Its zizmor half has a CI
+  counterpart; its `pnpm audit` half has none, because auditing on every
+  PR lets a newly-published advisory in an unrelated package block
+  unrelated work. So run it deliberately: before a release, and whenever
+  touching dependencies.
 
 ## Commit Message Convention
 
