@@ -10,8 +10,14 @@ on:
 permissions:
   contents: read
 
+# Supersede in-flight runs for the same branch/PR; never cancel main.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   lint-and-test:
+    name: Lint and test
     runs-on: ubuntu-latest
 
     steps:
@@ -36,7 +42,9 @@ jobs:
       - name: Install dependencies
         run: mise run install
 
-      - name: Lint (Biome)
+      # Together these are exactly `mise run ci`, kept as separate steps
+      # so a failure is attributable from the run summary.
+      - name: Lint (Biome + actionlint)
         run: mise run lint
 
       - name: Typecheck
@@ -44,6 +52,9 @@ jobs:
 
       - name: Test
         run: mise run test
+
+      - name: Build
+        run: mise run build
 
   zizmor:
     name: Zizmor (GitHub Actions audit)
@@ -59,4 +70,11 @@ jobs:
         uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
         with:
           advanced-security: false
-
+          # The action's own defaults are version "latest" and
+          # collect "default". Pin the version so a zizmor release cannot
+          # turn CI red on its own, and set collect: all so
+          # .github/dependabot.yml is audited too. Both must match
+          # `mise run audit` for that task to be a real local mirror —
+          # bump them together.
+          version: "1.29.0"
+          collect: all
