@@ -1,4 +1,6 @@
 # Dependencies
+# pnpm-lock.yaml is deliberately absent from this file: it is committed
+# and is what pins every package to an exact version and hash.
 node_modules/
 .pnpm-store/
 
@@ -23,6 +25,11 @@ yarn-error.log*
 .env.*
 !.env.example
 
+# mise local overrides (the committed .mise.toml is the shared config)
+.mise.local.toml
+mise.local.toml
+.mise/
+
 # IDEs and editors
 .vscode/
 .idea/
@@ -39,5 +46,8 @@ yarn-error.log*
 ehthumbs.db
 Thumbs.db
 
-# Claude local settings
+# Claude
+# `.claude/` itself is tracked on purpose — settings.json is shared
+# config. Only per-user state and scratch worktrees are ignored.
 .claude/settings.local.json
+.claude/worktrees
