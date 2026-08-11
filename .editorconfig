@@ -1,0 +1,24 @@
+# https://editorconfig.org/
+# Keeps editors that are not running Biome in line with Biome's output.
+# The [*] block mirrors biome.json's formatter block (space indent,
+# width 4, LF).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Biome does not format YAML, and the workflows, dependabot config and
+# pnpm-workspace.yaml in this repo are all committed with 2-space
+# indentation.
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.md]
+indent_size = 2
+# Two trailing spaces are a hard line break in Markdown.
+trim_trailing_whitespace = false
