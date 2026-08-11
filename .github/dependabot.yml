@@ -1,5 +1,12 @@
 version: 2
 updates:
+  # "npm" is the ecosystem that covers pnpm: it reads package.json and
+  # pnpm-lock.yaml. There is no separate "pnpm" ecosystem. Confirmed
+  # against this repo's own history — dependabot PRs here update
+  # pnpm-lock.yaml, not just package.json.
+  #
+  # Nothing here covers the tools pinned in .mise.toml; refresh those
+  # deliberately with `mise up`.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
