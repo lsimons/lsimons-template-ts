@@ -80,7 +80,6 @@ lsimons-template-ts/
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE                   # Apache-2.0
-├── SECURITY.md               # Vulnerability reporting route
 ├── package.json              # Project manifest
 ├── pnpm-lock.yaml            # Committed; never gitignore this
 ├── pnpm-workspace.yaml       # pnpm settings (not a monorepo)
@@ -141,7 +140,3 @@ See [LICENSE](./LICENSE).
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md). AI agents see
 [AGENTS.md](./AGENTS.md).
-
-## Security
-
-See [SECURITY.md](./SECURITY.md).
