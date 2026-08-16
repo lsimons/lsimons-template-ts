@@ -18,14 +18,16 @@ Every repo task lives in `.mise.toml`; `mise tasks` lists them. The
 | -------------------- | ----------------------------------------------------- |
 | `mise install`       | Install the pinned toolchain                          |
 | `mise run init`      | Rename the `template` placeholder to the project name |
-| `mise run install`   | `pnpm install --frozen-lockfile`                      |
+| `mise run install`   | `pnpm install`; may update the lock                   |
+| `mise run install-frozen` | `pnpm install --frozen-lockfile`; what CI runs   |
 | `mise run lint`      | `biome check .` + `actionlint`                        |
 | `mise run format`    | `biome format --write .`                              |
 | `mise run typecheck` | `tsc --noEmit`                                        |
 | `mise run test`      | `vitest run --coverage`                               |
 | `mise run build`     | `tsc -p tsconfig.build.json` (emit `dist/`)           |
 | `mise run ci`        | Full gate: lint + typecheck + test + build            |
-| `mise run audit`     | `zizmor` over workflows + `pnpm audit` over deps      |
+| `mise run audit`     | `zizmor` over workflows + dependabot config           |
+| `mise run vuln`      | `pnpm audit` over the dependency tree (no token)      |
 | `mise run ci-watch`  | Watch GitHub Actions for the current branch           |
 
 Running directly, without mise: `pnpm start` (or `node src/cli.ts`),
@@ -77,9 +79,17 @@ docs/spec/                Feature specifications
 
 **Supply chain:**
 
-- `pnpm-lock.yaml` is committed and must stay in the tree. Install with
-  `--frozen-lockfile` (what `mise run install` does) so CI cannot
-  silently resolve something different from what was reviewed.
+- `pnpm-lock.yaml` is committed and must stay in the tree. CI installs
+  with `install-frozen` (`--frozen-lockfile`) so it cannot silently
+  resolve something different from what was reviewed. Plain
+  `mise run install` is unfrozen and is the task you run while
+  deliberately changing dependencies.
+- Watch for dependencies that reach the tree as *optional peers* — pnpm
+  auto-installs them, so they appear in no manifest, `pnpm update` and
+  `pnpm dedupe` both report "already up to date" because no importer
+  declares them, and dependabot cannot see them at all. `vite` (via
+  vitest) is one, which is why it is declared explicitly in
+  `package.json` despite nothing importing it directly.
 - Package versions in `package.json` stay as ranges. The lockfile is the
   pin; hard-pinning the ranges would add nothing and would fight
   dependabot.
@@ -89,12 +99,19 @@ docs/spec/                Feature specifications
   included. Nothing there is covered by dependabot, so refresh it
   deliberately with `mise up` and read the diff.
 - `mise run audit` refuses to run without a GitHub token rather than
-  quietly falling back to zizmor's weaker offline checks.
-- **`mise run audit` is not enforced by CI.** Its zizmor half has a CI
-  counterpart; its `pnpm audit` half has none, because auditing on every
-  PR lets a newly-published advisory in an unrelated package block
-  unrelated work. So run it deliberately: before a release, and whenever
-  touching dependencies.
+  quietly falling back to zizmor's weaker offline checks. It is zizmor
+  only; the dependency scan is now `mise run vuln`.
+- **`mise run vuln` (`pnpm audit`) has its own CI job.** This reverses an
+  earlier decision to leave it out of CI, which reasoned that auditing on
+  every PR lets a newly-published advisory in an unrelated package block
+  unrelated work. That cost is real, but the alternative proved worse:
+  `pnpm audit` sat behind `audit`'s token gate, which exits before
+  reaching it, so on any machine without `gh auth login` it ran nowhere
+  at all — and this repo's vite and nanoid advisories (1b617aa) were duly
+  found by hand rather than by any gate. A separate job keeps the
+  attribution honest: a red `vuln` never implies the code broke. If the
+  blocking is unwanted, the lever is branch protection — leave `vuln` out
+  of the required checks — not removing the check.
 
 ## Commit Message Convention
 

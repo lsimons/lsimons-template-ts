@@ -24,11 +24,21 @@
         "test": "vitest run --coverage",
         "test:watch": "vitest"
     },
+    "comment:vite": [
+        "vite is an *optional peer* of vitest, so pnpm auto-installs it: it",
+        "appears in no manifest, `pnpm update` and `pnpm dedupe` both report",
+        "'already up to date' because no importer declares it, and dependabot",
+        "cannot see it at all. 1b617aa cleared its advisories by re-resolving",
+        "the whole lockfile, which fixed that instance but not the mechanism —",
+        "nothing would move it the next time it drifts. Declaring it here makes",
+        "it a managed pin. Keep the range inside vitest's peer range (^8.0.0)."
+    ],
     "devDependencies": {
         "@biomejs/biome": "^2.5.7",
         "@types/node": "^26.2.0",
         "@vitest/coverage-v8": "^4.1.10",
         "typescript": "^7.0.2",
+        "vite": "^8.2.1",
         "vitest": "^4.1.10"
     }
 }

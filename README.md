@@ -14,7 +14,7 @@ Add that key when you need a monorepo.
    mise trust            # once per clone: trust this repo's .mise.toml
    mise install          # pin + install node + pnpm + lint/audit tools
    mise run init         # rename `template` → your project name
-   mise run install      # pnpm install --frozen-lockfile
+   mise run install      # pnpm install
    ```
 
    `mise run init` auto-detects your project name from the git remote
@@ -98,7 +98,8 @@ containing the target path.
 ```bash
 mise trust            # once per clone
 mise install          # one-time: pin + install toolchain
-mise run install      # pnpm install --frozen-lockfile
+mise run install      # pnpm install; may update the lock
+mise run install-frozen  # frozen install (what CI runs)
 
 # Run (no build step — native TS type stripping on Node 24)
 pnpm start
@@ -110,7 +111,8 @@ mise run lint         # biome check . + actionlint
 mise run format       # biome format --write .
 mise run build        # tsc -p tsconfig.build.json (emit dist/)
 mise run ci           # full CI gate: lint + typecheck + test + build
-mise run audit        # zizmor over workflows + pnpm audit over dependencies
+mise run audit        # zizmor over workflows + dependabot config
+mise run vuln         # pnpm audit over the dependency tree
 mise run ci-watch     # watch GitHub Actions for the current branch
 ```
 

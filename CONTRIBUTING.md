@@ -13,7 +13,7 @@ Please do not report a security problem in a public issue. Use the "Report a vul
 ```bash
 mise trust            # once per clone
 mise install          # install the pinned toolchain
-mise run install      # pnpm install --frozen-lockfile
+mise run install      # pnpm install (unfrozen; CI uses install-frozen)
 mise run ci           # lint + typecheck + test + build — must pass before you push
 ```
 

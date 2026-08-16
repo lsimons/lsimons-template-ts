@@ -47,8 +47,19 @@ _.file = { path = ".env", optional = true }
 description = "Rename this template to a new project (see scripts/init.py)"
 run = "python3 scripts/init.py"
 
+# Unfrozen: this is the task you run while deliberately changing
+# dependencies, so it is allowed to update pnpm-lock.yaml. An
+# always-frozen `install` fails in the middle of the one workflow where
+# relocking is the point. `install-frozen` is what the gate and CI use.
 [tasks.install]
-description = "pnpm install --frozen-lockfile"
+description = "pnpm install; may update pnpm-lock.yaml"
+run = "pnpm install"
+
+# What CI runs. A package.json change the lock does not reflect must fail
+# the run rather than be re-resolved on the runner into an unreviewed
+# version set — a lockfile CI is willing to regenerate is not a pin.
+[tasks."install-frozen"]
+description = "pnpm install, failing on a stale pnpm-lock.yaml"
 run = "pnpm install --frozen-lockfile"
 
 [tasks.lint]
@@ -99,7 +110,7 @@ depends = ["lint", "typecheck", "test", "build"]
 # unverified result, not a pass — so refuse to run rather than exit 0 on
 # a weaker check than the name promises.
 [tasks.audit]
-description = "zizmor audit of workflows + dependabot config, then pnpm audit of dependencies"
+description = "zizmor audit of GitHub Actions workflows + dependabot config"
 run = """
 set -e
 GH_TOKEN=$(gh auth token 2>/dev/null) || true
@@ -110,8 +121,23 @@ if [ -z "$GH_TOKEN" ]; then
 fi
 export GH_TOKEN
 zizmor --strict-collection .
-pnpm audit
 """
+
+# `pnpm audit` used to be the last line of `audit`, after the token gate
+# above. It needs no token — but the gate exits 1 before reaching it, so
+# on any machine without `gh auth login` the dependency scan simply never
+# ran. Worse, nothing in CI ran it either: the workflow has a lint/test
+# job and a zizmor job, and neither calls `audit`. This repo's vite and
+# nanoid advisories (1b617aa) were found by hand for exactly that reason.
+#
+# So it is its own task with its own CI job. Not part of `ci`, because it
+# queries the registry's advisory API and `ci` is meant to stay runnable
+# offline — and because it fails on a newly published advisory against an
+# unchanged tree, which must be able to go red without implying the code
+# broke.
+[tasks.vuln]
+description = "pnpm audit of the dependency tree (network; no token; not part of `ci`)"
+run = "pnpm audit"
 
 [tasks.ci-watch]
 description = "Watch GitHub Actions CI for the current branch; exits non-zero on failure"

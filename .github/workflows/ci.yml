@@ -42,8 +42,11 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-
 
+      # The frozen task, not `install`: a package.json change that
+      # pnpm-lock.yaml does not reflect must fail here rather than be
+      # silently re-resolved on the runner.
       - name: Install dependencies
-        run: mise run install
+        run: mise run install-frozen
 
       # The same four checks as `mise run ci`, but run sequentially and as
       # separate steps. `mise run ci` uses `depends`, which runs them
@@ -61,6 +64,35 @@ jobs:
 
       - name: Build
         run: mise run build
+
+  vuln:
+    name: Dependency vulnerability scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up mise
+        uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4
+        with:
+          install: true
+          cache: true
+
+      - name: Install dependencies
+        run: mise run install-frozen
+
+      # Its own job, and new: `pnpm audit` previously lived only inside
+      # `mise run audit`, behind a GitHub-token gate it does not need, and
+      # nothing in CI called it — so the dependency scan ran nowhere
+      # automatic. A separate job also lets a newly published advisory
+      # against an unchanged tree go red without implying the code broke.
+      - name: Audit dependencies (pnpm audit)
+        run: mise run vuln
 
   zizmor:
     name: Zizmor (GitHub Actions audit)
