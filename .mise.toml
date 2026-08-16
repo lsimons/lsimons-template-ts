@@ -8,6 +8,10 @@
 # mise's own `[tools]` table takes precedence over idiomatic version
 # files. Change both together.
 
+[settings]
+minimum_release_age = "7d"
+lockfile = true
+
 # Every tool is pinned to an exact version, deliberately and without
 # exception — including node. This is a supply-chain rule, not a
 # stability one: an upstream compromise must never be auto-downloaded.
@@ -23,7 +27,7 @@
 # stale silently. Refresh them deliberately with `mise up`, and read the
 # diff.
 [tools]
-node = "24.19.0"
+node = "26.7.0"
 # Must match `packageManager` in package.json — corepack and mise both
 # read a version and they must not disagree. Bump them together.
 pnpm = "11.20.0"
