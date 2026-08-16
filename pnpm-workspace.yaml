@@ -1,3 +1,17 @@
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - "@lsimons/*"
+
+# Transitive-only overrides. Each one is a patch this repo forces ahead of
+# the intermediate package's own range, so each needs a reason and a
+# removal condition — otherwise they silently pin dependencies forever.
+#
+# nanoid: GHSA-2v37-7h3g-55p8 (high, CWE-835) is fixed in 3.3.18. The
+# chain is vitest > vite > postcss > nanoid, so it is dev-only and not
+# reachable from anything this package ships, but `pnpm audit` fails on
+# it and a red audit that everyone learns to ignore is worse than the
+# bug. postcss already allows ^3.3.17, so this only nudges resolution
+# forward. Drop it once postcss publishes a release that resolves to
+# >=3.3.18 on its own.
+overrides:
+  nanoid@<3.3.18: "^3.3.18"
