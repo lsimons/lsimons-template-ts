@@ -36,7 +36,7 @@ Running directly, without mise: `pnpm start` (or `node src/cli.ts`),
 ## Structure
 
 ```
-.github/workflows/ci.yml  CI: mise run lint/typecheck/test/build + zizmor audit
+.github/workflows/ci.yml  CI: lint/typecheck/test/build + pnpm audit + zizmor
 .github/dependabot.yml    Weekly npm + github-actions updates, 7-day cooldown
 .mise.toml                Pinned toolchain + every repo task
 package.json              Manifest, pnpm scripts, devDependencies
@@ -70,48 +70,29 @@ docs/spec/                Feature specifications
   branches and statements (`thresholds` in `vitest.config.ts`, enforced by
   `mise run test`).
 - No implicit `any`; prefer `unknown` at boundaries.
-- Do not silence a check without a written justification on the same
-  line — a bare `// biome-ignore` or `// @ts-expect-error` is not
-  acceptable, a narrow one with a reason is. Prefer fixing the cause;
-  suppress when the cause is outside this repo.
-- Never weaken a control to make a check pass: do not lower the coverage
-  thresholds, unpin an action, or delete a failing test.
+- No bare `// biome-ignore` or `// @ts-expect-error`. Narrow it and name
+  the reason on the same line. Prefer fixing the cause.
+- Never weaken a control to make a check pass: no lowered coverage
+  thresholds, no unpinned actions or tools, no deleted tests.
 
 **Supply chain:**
 
 - `pnpm-lock.yaml` is committed and must stay in the tree. CI installs
-  with `install-frozen` (`--frozen-lockfile`) so it cannot silently
-  resolve something different from what was reviewed. Plain
-  `mise run install` is unfrozen and is the task you run while
-  deliberately changing dependencies.
-- Watch for dependencies that reach the tree as *optional peers* — pnpm
-  auto-installs them, so they appear in no manifest, `pnpm update` and
-  `pnpm dedupe` both report "already up to date" because no importer
-  declares them, and dependabot cannot see them at all. `vite` (via
-  vitest) is one, which is why it is declared explicitly in
-  `package.json` despite nothing importing it directly.
-- Package versions in `package.json` stay as ranges. The lockfile is the
-  pin; hard-pinning the ranges would add nothing and would fight
-  dependabot.
-- GitHub Actions are pinned to full-length commit SHAs with a `# vX.Y.Z`
-  comment, and `zizmor` enforces that in CI.
-- Every tool in `.mise.toml` is pinned to an exact version, node and pnpm
-  included. Nothing there is covered by dependabot, so refresh it
-  deliberately with `mise up` and read the diff.
-- `mise run audit` refuses to run without a GitHub token rather than
-  quietly falling back to zizmor's weaker offline checks. It is zizmor
-  only; the dependency scan is now `mise run vuln`.
-- **`mise run vuln` (`pnpm audit`) has its own CI job.** This reverses an
-  earlier decision to leave it out of CI, which reasoned that auditing on
-  every PR lets a newly-published advisory in an unrelated package block
-  unrelated work. That cost is real, but the alternative proved worse:
-  `pnpm audit` sat behind `audit`'s token gate, which exits before
-  reaching it, so on any machine without `gh auth login` it ran nowhere
-  at all — and this repo's vite and nanoid advisories (1b617aa) were duly
-  found by hand rather than by any gate. A separate job keeps the
-  attribution honest: a red `vuln` never implies the code broke. If the
-  blocking is unwanted, the lever is branch protection — leave `vuln` out
-  of the required checks — not removing the check.
+  with `install-frozen`; use plain `mise run install` when deliberately
+  changing dependencies.
+- Versions in `package.json` stay as ranges — the lockfile is the pin.
+- Watch for dependencies that arrive as *optional peers*: pnpm
+  auto-installs them, so they are in no manifest, `pnpm update` and
+  `pnpm dedupe` are no-ops on them, and dependabot cannot see them.
+  Declare them explicitly, as `package.json` does for `vite`.
+- Pin GitHub Actions to full-length commit SHAs; `zizmor` enforces it.
+- Every `.mise.toml` tool is exact-pinned and invisible to dependabot;
+  refresh with `mise up` and read the diff.
+- `mise run audit` (zizmor) refuses to run without a GitHub token rather
+  than falling back to weaker offline checks.
+- `mise run vuln` (`pnpm audit`) must be clean. It has its own CI job; if
+  you want it non-blocking, drop it from the required checks rather than
+  removing the check.
 
 ## Commit Message Convention
 
@@ -123,30 +104,11 @@ Follow [Conventional Commits](https://conventionalcommits.org/):
 
 ## Session Completion
 
-Work is NOT complete until every change is committed, pushed, and CI passes.
+Work is not complete until every change is committed, pushed, and CI passes.
 
-1. **Quality gates** (if code changed):
-   ```bash
-   mise run ci
-   ```
+1. `mise run ci` (or the tasks that changed)
+2. Commit everything — do not leave the working tree dirty
+3. `git pull --rebase && git push`
+4. `mise run ci-watch`; on failure `gh run view --log-failed`, fix, repeat
 
-2. **Commit**: stage and commit every change from this session. Do not leave the working tree dirty.
-   ```bash
-   git status              # review untracked and unstaged files
-   git add <files>
-   git commit -m "<type>(<scope>): <description>"
-   ```
-
-3. **Push**:
-   ```bash
-   git pull --rebase && git push
-   git status  # must show "up to date with origin"
-   ```
-
-4. **Verify CI**:
-   ```bash
-   mise run ci-watch
-   ```
-   On failure, inspect with `gh run view --log-failed`, fix, commit, push, and re-watch.
-
-Never stop before CI is green. If anything fails, resolve and retry.
+Never stop before CI is green.
