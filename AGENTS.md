@@ -80,7 +80,8 @@ docs/spec/                Feature specifications
 - `pnpm-lock.yaml` is committed and must stay in the tree. CI installs
   with `install-frozen`; use plain `mise run install` when deliberately
   changing dependencies.
-- Versions in `package.json` stay as ranges — the lockfile is the pin.
+- Versions in `package.json` are exact-pinned (bare `x.y.z`, no `^` or
+  `~`); `pnpm-lock.yaml` pins the transitive graph.
 - Watch for dependencies that arrive as *optional peers*: pnpm
   auto-installs them, so they are in no manifest, `pnpm update` and
   `pnpm dedupe` are no-ops on them, and dependabot cannot see them.
