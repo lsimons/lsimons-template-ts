@@ -19,9 +19,9 @@ lockfile = true
 # to review than a per-dependency judgement about which upstreams are
 # trustworthy enough to float.
 #
-# This does NOT extend to the packages in package.json: pnpm-lock.yaml
-# already pins those to an exact version and integrity hash, so pinning
-# the ranges as well would add nothing and would fight dependabot.
+# The packages in package.json follow the same rule: they are exact
+# pins too, and pnpm-lock.yaml pins the transitive graph with integrity
+# hashes. Those are covered by dependabot, which bumps the exact pin.
 #
 # The cost is that nothing here is covered by dependabot, so these go
 # stale silently. Refresh them deliberately with `mise up`, and read the
