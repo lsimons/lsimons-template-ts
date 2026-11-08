@@ -6,21 +6,16 @@ minimumReleaseAgeExclude:
 # the intermediate package's own range, so each needs a reason and a
 # removal condition — otherwise they silently pin dependencies forever.
 #
-# nanoid: GHSA-2v37-7h3g-55p8 (high, CWE-835) is fixed in 3.3.18. The
-# chain is vitest > vite > postcss > nanoid, so it is dev-only and not
+# source-map-js: GHSA-68fv-2mgg-jv7q (high, event-loop DoS via indexed
+# source-map section offsets) is fixed in 1.2.2. The chain is
+# @vitest/coverage-v8 > magicast > source-map-js. It is dev-only and not
 # reachable from anything this package ships, but `pnpm audit` fails on
 # it and a red audit that everyone learns to ignore is worse than the
-# bug. postcss already allows ^3.3.17, so this only nudges resolution
-# forward. Drop it once postcss publishes a release that resolves to
-# >=3.3.18 on its own.
+# bug. magicast already allows ^1.2.1, so this only nudges resolution
+# forward. postcss requires ^1.2.2 itself since 8.5.32. Drop this once
+# magicast publishes a release that resolves to >=1.2.2 on its own.
 #
-# source-map-js: GHSA-68fv-2mgg-jv7q (high, event-loop DoS via indexed
-# source-map section offsets) is fixed in 1.2.2. The chains are
-# vitest > vite > postcss > source-map-js and @vitest/coverage-v8 >
-# magicast > source-map-js — dev-only, same reasoning as nanoid above.
-# postcss and magicast both already allow ^1.2.1, so this only nudges
-# resolution forward. Drop it once both publish a release that resolves
-# to >=1.2.2 on its own.
+# (A nanoid override for GHSA-2v37-7h3g-55p8 used to sit here; it was
+# dropped once postcss 8.5.32 started requiring nanoid ^3.3.20.)
 overrides:
-  nanoid@<3.3.18: "^3.3.18"
   source-map-js@<1.2.2: "^1.2.2"
