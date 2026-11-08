@@ -27,10 +27,14 @@ Add that key when you need a monorepo.
    modules. Keep `.ts` extensions in import specifiers — required by
    Node's native TypeScript support and `NodeNext` module resolution.
 5. Run `/setup` in your agent of choice. Repository settings — issue
-   labels, private vulnerability reporting, Dependabot alerts and
-   security updates — are GitHub state rather than files, so
-   `Use this template` does not copy them and nothing in this repo can
-   create them. `/setup` configures them against the new repo directly.
+   labels, private vulnerability reporting, Dependabot alerts — are
+   GitHub state rather than files, so `Use this template` does not copy
+   them and nothing in this repo can create them. `/setup` configures
+   them against the new repo directly. Keep Dependabot *alerts* on
+   (Renovate reads them) but leave Dependabot security updates off:
+   update PRs come from Renovate, via the inherited `renovate.json` and
+   the `lsimons-renovate` GitHub App, which is already installed on
+   every lsimons/ repo.
 
 ## Included Configuration
 
@@ -51,9 +55,12 @@ Add that key when you need a monorepo.
   full-length commit SHAs, an [actionlint](https://github.com/rhysd/actionlint)
   workflow check and a [zizmor](https://docs.zizmor.sh/) workflow-security
   audit
-- **Dependabot** for `npm` (which covers `pnpm-lock.yaml`) and
-  `github-actions`, weekly, with a 7-day cooldown; pnpm's own
-  `minimumReleaseAge` gives the same cooldown locally
+- **Renovate** (`renovate.json`, extending the shared
+  [lsimons/.github preset](https://github.com/lsimons/.github#renovate))
+  for `package.json` + `pnpm-lock.yaml`, GitHub Actions, `.nvmrc` and the
+  `.mise.toml` tools, with a 7-day minimum release age; pnpm's own
+  `minimumReleaseAge` gives the same cooldown to transitive
+  dependencies, which Renovate does not age
 - **`.mise.toml`** pins every tool to an exact version — node included —
   and defines every repo task
 - **`.editorconfig`** so editors that are not running Biome still agree
@@ -64,7 +71,6 @@ Add that key when you need a monorepo.
 ```
 lsimons-template-ts/
 ├── .github/workflows/ci.yml  # CI pipeline (mise-action + zizmor)
-├── .github/dependabot.yml    # Weekly dependency updates
 ├── .editorconfig             # Editor defaults
 ├── .mise.toml                # Toolchain pin + task runner
 ├── .nvmrc                    # Node version pin (kept in sync with .mise.toml)
@@ -83,6 +89,7 @@ lsimons-template-ts/
 ├── package.json              # Project manifest
 ├── pnpm-lock.yaml            # Committed; never gitignore this
 ├── pnpm-workspace.yaml       # pnpm settings (not a monorepo)
+├── renovate.json             # Dependency updates (shared preset)
 ├── tsconfig.json             # TypeScript config (dev / typecheck)
 ├── tsconfig.build.json       # TypeScript config (emit dist/)
 ├── vitest.config.ts          # Test + coverage config
@@ -111,7 +118,7 @@ mise run lint         # biome check . + actionlint
 mise run format       # biome format --write .
 mise run build        # tsc -p tsconfig.build.json (emit dist/)
 mise run ci           # full CI gate: lint + typecheck + test + build
-mise run audit        # zizmor over workflows + dependabot config
+mise run audit        # zizmor over workflows
 mise run vuln         # pnpm audit over the dependency tree
 mise run ci-watch     # watch GitHub Actions for the current branch
 ```

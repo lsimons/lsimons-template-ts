@@ -111,12 +111,12 @@ jobs:
           advanced-security: false
           # The action defaults this to "latest". Pin it so a zizmor
           # release cannot turn CI red on its own, and keep it in step
-          # with the `zizmor` entry in .mise.toml — bump them together.
+          # with the `zizmor` entry in .mise.toml — Renovate bumps both;
+          # check they still match in its PR.
           version: "1.31.1"
           # `collect` is deliberately left at the action's default.
           # zizmor's `default` and `all` collect the same kinds of input
           # — workflows, action definitions, dependabot and pre-commit
           # config — and differ only in whether .gitignore is honoured.
-          # `default` already audits .github/dependabot.yml here, and
           # `all` would additionally walk gitignored trees such as
           # node_modules/, which is the wrong direction.

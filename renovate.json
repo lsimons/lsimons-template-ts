@@ -1,0 +1,12 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["local>lsimons/.github:renovate-config"],
+    "packageRules": [
+        {
+            "description": "vite is declared only to make vitest's optional peer a managed pin, and must stay inside vitest's peer range (see comment:vite in package.json). pnpm only warns on a peer mismatch, so CI would pass; hold vite majors for a human to check that range.",
+            "matchPackageNames": ["vite"],
+            "matchUpdateTypes": ["major"],
+            "automerge": false
+        }
+    ]
+}

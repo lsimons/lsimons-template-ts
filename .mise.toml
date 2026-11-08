@@ -21,18 +21,22 @@ lockfile = true
 #
 # The packages in package.json follow the same rule: they are exact
 # pins too, and pnpm-lock.yaml pins the transitive graph with integrity
-# hashes. Those are covered by dependabot, which bumps the exact pin.
+# hashes. Renovate's npm manager bumps the exact pin together with the
+# lock.
 #
-# The cost is that nothing here is covered by dependabot, so these go
-# stale silently. Refresh them deliberately with `mise up`, and read the
-# diff.
+# The tools here are covered by Renovate's mise manager, which proposes
+# bumps for these pins and mise.lock (after its 7-day minimumReleaseAge,
+# matching `minimum_release_age` above), so read the diff of those PRs
+# like any other.
 [tools]
 node = "26.13.0"
 # Must match `packageManager` in package.json — corepack and mise both
-# read a version and they must not disagree. Bump them together.
+# read a version and they must not disagree. Renovate bumps both (mise
+# and npm managers); check that they still match when reviewing its PR.
 pnpm = "12.17.0"
 # Used by `mise run audit`; must match `version:` in the workflow's
-# zizmor job. Bump them together.
+# zizmor job. Renovate bumps both (mise manager here, github-actions
+# manager there); check that they still match when reviewing its PR.
 zizmor = "1.31.1"
 # Used by `mise run lint`. actionlint shells out to shellcheck for the
 # `run:` blocks in workflows, and silently skips that half if shellcheck
@@ -89,8 +93,7 @@ depends = ["lint", "typecheck", "test", "build"]
 # Supply-chain audit. Two halves, both needing the network, which is why
 # neither is part of `ci`:
 #
-#   1. zizmor over the workflows and the dependabot config, using the
-#      mise-pinned binary.
+#   1. zizmor over the workflows, using the mise-pinned binary.
 #   2. `pnpm audit` over the resolved dependency tree, which zizmor does
 #      not look at at all.
 #
@@ -98,9 +101,8 @@ depends = ["lint", "typecheck", "test", "build"]
 # it. `--strict-collection` (fail rather than warn on schema errors in a
 # collected file) has no corresponding zizmor-action input, so it can
 # only be had locally. `--collect` is left off for the same reason it is
-# left off in CI: zizmor's default already collects every input kind
-# including dependabot config, and `all` differs only by ignoring
-# .gitignore.
+# left off in CI: zizmor's default already collects every input kind,
+# and `all` differs only by ignoring .gitignore.
 #
 # `pnpm audit` has no CI counterpart at all, so it runs only when someone
 # types this — see the note in AGENTS.md.
@@ -110,7 +112,7 @@ depends = ["lint", "typecheck", "test", "build"]
 # unverified result, not a pass — so refuse to run rather than exit 0 on
 # a weaker check than the name promises.
 [tasks.audit]
-description = "zizmor audit of GitHub Actions workflows + dependabot config"
+description = "zizmor audit of GitHub Actions workflows"
 run = """
 set -e
 GH_TOKEN=$(gh auth token 2>/dev/null) || true

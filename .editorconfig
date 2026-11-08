@@ -15,9 +15,8 @@ indent_style = space
 indent_size = 4
 max_line_length = 100
 
-# Biome does not format YAML, and the workflows, dependabot config and
-# pnpm-workspace.yaml in this repo are all committed with 2-space
-# indentation.
+# Biome does not format YAML, and the workflows and pnpm-workspace.yaml
+# in this repo are all committed with 2-space indentation.
 [*.{yml,yaml}]
 indent_size = 2
 

@@ -27,11 +27,12 @@
     "comment:vite": [
         "vite is an *optional peer* of vitest, so pnpm auto-installs it: it",
         "appears in no manifest, `pnpm update` and `pnpm dedupe` both report",
-        "'already up to date' because no importer declares it, and dependabot",
-        "cannot see it at all. 1b617aa cleared its advisories by re-resolving",
-        "the whole lockfile, which fixed that instance but not the mechanism —",
-        "nothing would move it the next time it drifts. Declaring it here makes",
-        "it a managed pin. Keep the range inside vitest's peer range (^8.0.0)."
+        "'already up to date' because no importer declares it, and Renovate",
+        "proposes no update for it (only its weekly lock file maintenance",
+        "re-resolves it). 1b617aa cleared its advisories by re-resolving the",
+        "whole lockfile, which fixed that instance but not the mechanism.",
+        "Declaring it here makes it a managed pin. Keep the range inside",
+        "vitest's peer range (^8.0.0); renovate.json holds vite majors for review."
     ],
     "devDependencies": {
         "@biomejs/biome": "2.6.4",

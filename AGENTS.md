@@ -26,7 +26,7 @@ Every repo task lives in `.mise.toml`; `mise tasks` lists them. The
 | `mise run test`      | `vitest run --coverage`                               |
 | `mise run build`     | `tsc -p tsconfig.build.json` (emit `dist/`)           |
 | `mise run ci`        | Full gate: lint + typecheck + test + build            |
-| `mise run audit`     | `zizmor` over workflows + dependabot config           |
+| `mise run audit`     | `zizmor` over workflows                               |
 | `mise run vuln`      | `pnpm audit` over the dependency tree (no token)      |
 | `mise run ci-watch`  | Watch GitHub Actions for the current branch           |
 
@@ -37,11 +37,11 @@ Running directly, without mise: `pnpm start` (or `node src/cli.ts`),
 
 ```
 .github/workflows/ci.yml  CI: lint/typecheck/test/build + pnpm audit + zizmor
-.github/dependabot.yml    Weekly npm + github-actions updates, 7-day cooldown
 .mise.toml                Pinned toolchain + every repo task
 package.json              Manifest, pnpm scripts, devDependencies
 pnpm-lock.yaml            Committed; never gitignore this
 pnpm-workspace.yaml       pnpm settings (minimumReleaseAge), not a monorepo
+renovate.json             Renovate: npm, actions, node and mise tool updates (shared preset)
 biome.json                Lint + format config
 tsconfig.json             TypeScript config for dev / typecheck
 tsconfig.build.json       TypeScript config for emitting dist/
@@ -84,11 +84,12 @@ docs/spec/                Feature specifications
   `~`); `pnpm-lock.yaml` pins the transitive graph.
 - Watch for dependencies that arrive as *optional peers*: pnpm
   auto-installs them, so they are in no manifest, `pnpm update` and
-  `pnpm dedupe` are no-ops on them, and dependabot cannot see them.
+  `pnpm dedupe` are no-ops on them, and Renovate proposes no update for
+  them (only its weekly lock file maintenance re-resolves them).
   Declare them explicitly, as `package.json` does for `vite`.
 - Pin GitHub Actions to full-length commit SHAs; `zizmor` enforces it.
-- Every `.mise.toml` tool is exact-pinned and invisible to dependabot;
-  refresh with `mise up` and read the diff.
+- Every `.mise.toml` tool is exact-pinned. Renovate proposes the bumps
+  (mise tools, packages, `.nvmrc`, actions); read the diff.
 - `mise run audit` (zizmor) refuses to run without a GitHub token rather
   than falling back to weaker offline checks.
 - `mise run vuln` (`pnpm audit`) must be clean. It has its own CI job; if
