@@ -29,11 +29,11 @@ lockfile = true
 # matching `minimum_release_age` above), so read the diff of those PRs
 # like any other.
 [tools]
-node = "26.13.0"
+node = "26.13.1"
 # Must match `packageManager` in package.json — corepack and mise both
 # read a version and they must not disagree. Renovate bumps both (mise
 # and npm managers); check that they still match when reviewing its PR.
-pnpm = "12.18.0"
+pnpm = "12.21.0"
 # Used by `mise run audit`; must match `version:` in the workflow's
 # zizmor job. Renovate bumps both (mise manager here, github-actions
 # manager there); check that they still match when reviewing its PR.
